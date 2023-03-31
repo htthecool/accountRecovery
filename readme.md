@@ -38,6 +38,8 @@ I have created a routes component that handles all screens. Currently, I have pu
 
 Contains logic to recover account using mnemonic key.
 
+! [Screenshot of the screen]("/assets/Account Recovery Screen.png")
+
 ## Storing Private Key
 
 Both Ios and Android devices offer Keychain service for secure storage of private keys. In this project I am storing private key in the OS offered Keychain. This is safe enough. Both Android and IOS have security mechanisms to prevent unauthorized access.
