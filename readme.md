@@ -37,3 +37,9 @@ I have created a routes component that handles all screens. Currently, I have pu
 ### RecoverScreen.js
 
 Contains logic to recover account using mnemonic key.
+
+## Storing Private Key
+
+Both Ios and Android devices offer Keychain service for secure storage of private keys. In this project I am storing private key in the OS offered Keychain. This is safe enough. Both Android and IOS have security mechanisms to prevent unauthorized access.
+
+For added protection, we can always add a 2-tier authentication system to authorize any transactions. There are many web2 solutions, but I am not aware of any web3 2 tier auth password generators.
