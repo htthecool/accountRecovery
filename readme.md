@@ -38,7 +38,7 @@ I have created a routes component that handles all screens. Currently, I have pu
 
 Contains logic to recover account using mnemonic key.
 
-![Screenshot of the screen](./assets/Account Recovery Screen.png)
+![Screenshot of the screen](assets/Account Recovery Screen.png)
 
 ## Storing Private Key
 
