@@ -15,6 +15,7 @@ const KEYCHAIN_SERVICE_NAME = "alturaAppKeychain";
 export default function RecoveryScreen() {
   const [recoveredAccount, setRecoveredAccount] = React.useState(null);
   const [seedWords, setSeedWords] = React.useState(Array(12).fill(""));
+  const [error, setError] = React.useState(null);
   const { width } = useWindowDimensions();
 
   const handleWordChange = (id, value) => {
@@ -25,32 +26,59 @@ export default function RecoveryScreen() {
   };
 
   const recoverAccount = async () => {
-    const mnemonic = seedWords;
-    const web3 = new Web3(
-      new Web3.providers.WebsocketProvider(
-        "wss://ropsten.infura.io/ws/v3/393e1073c89543f18d2490bb052d7180"
-      )
-    );
+    try {
+      const mnemonic = seedWords;
 
-    const privateKey = Buffer.from(decode(mnemonic), "hex");
+      // using Truffle HD Wallet provider
+      /*
+        let provider = new HDWalletProvider({
+          mnemonic: {
+            phrase: mnemonicPhrase
+          },
+          providerOrUrl: "http://localhost:8545"
+        });
 
-    // add private key to keychain
-    await Keychain.setGenericPassword("eth_wallet_private_key", privateKey, {
-      service: KEYCHAIN_SERVICE_NAME,
-    });
+        const web3 = new Web3(provider); 
+            
+        const account = web3.eth.accounts.wallet
+          .create(1, mnemonic)
+          .accounts[0];
+      */
 
-    const account = web3.eth.accounts.privateKeyToAccount(
-      "0x" + privateKey.toString("hex")
-    );
+      const web3 = new Web3(
+        new Web3.providers.WebsocketProvider(
+          "wss://ropsten.infura.io/ws/v3/393e1073c89543f18d2490bb052d7180"
+        )
+      );
 
-    const weiBalance = web3.eth.getBalance(account.address);
+      const privateKey = Buffer.from(decode(mnemonic), "hex");
 
-    const balance = web3.utils.fromWei(weiBalance, "ether");
+      // add private key to keychain
+      await Keychain.setGenericPassword("eth_wallet_private_key", privateKey, {
+        service: KEYCHAIN_SERVICE_NAME,
+      });
 
-    setRecoveredAccount({
-      account,
-      balance,
-    });
+      const account = web3.eth.accounts.privateKeyToAccount(
+        "0x" + privateKey.toString("hex")
+      );
+
+      if (account?.address) {
+        const weiBalance = web3.eth.getBalance(account.address);
+
+        const balance = web3.utils.fromWei(weiBalance, "ether");
+
+        setRecoveredAccount({
+          account,
+          balance,
+        });
+      } else {
+        setError("Account not found, please check your mnemonic or try again");
+      }
+    } catch (error) {
+      setError("Something went wrong please try again");
+      // log error to erro reporting here
+      // console.log({error});
+    }
   };
 
   return (
@@ -72,6 +100,11 @@ export default function RecoveryScreen() {
           you open your wallet account. Please make sure you enter the words in
           the right order.
         </Text>
+        {error && (
+          <Text style={[styles.title, styles.error]} variant="bodyMedium">
+            {error}
+          </Text>
+        )}
         <View style={styles.formContainer}>
           {seedWords.map((word, idx) => (
             <View
@@ -123,5 +156,8 @@ const styles = StyleSheet.create({
   },
   actionContainer: {
     marginTop: 20,
+  },
+  error: {
+    color: "red",
   },
 });
